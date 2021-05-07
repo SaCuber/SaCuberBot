@@ -1,4 +1,5 @@
 import os
+import json
 import discord
 from discord.ext import commands
 
@@ -6,6 +7,9 @@ intents = discord.Intents.default()
 intents.members = True
 intents.presences = True
 client = commands.Bot(command_prefix='\\', case_insensitive=True, intents=intents)
+
+with open('./data/config.json') as f:
+    sid = json.load(f)['sid']
 
 
 @client.event
@@ -21,7 +25,7 @@ async def ping(ctx):
 
 @client.command(name='load', hidden=True)
 async def load(ctx, extension):
-    if ctx.message.author.id == (my_id):
+    if ctx.message.author.id == sid:
         if extension == 'all':
             for file in os.listdir('./cogs'):
                 if file == '__pycache__':
@@ -40,7 +44,7 @@ async def load(ctx, extension):
 
 @client.command(name='unload', hidden=True)
 async def unload(ctx, extension):
-    if ctx.message.author.id == (my_id):
+    if ctx.message.author.id == sid:
         if extension == 'all':
             for file in os.listdir('./cogs'):
                 if file == '__pycache__':
@@ -59,7 +63,7 @@ async def unload(ctx, extension):
 
 @client.command(name='reload', hidden=True)
 async def reload(ctx, extension):
-    if ctx.message.author.id == (my_id):
+    if ctx.message.author.id == sid:
         if extension == 'all':
             for file in os.listdir('./cogs'):
                 if file == '__pycache__':
@@ -82,4 +86,4 @@ for filename in os.listdir('./cogs'):
     if filename.endswith('.py'):
         client.load_extension(f'cogs.{filename[:-3]}')
 
-client.run(MyTokenWhyAreYouEvenLookingAtThisYouBastard)
+client.run()

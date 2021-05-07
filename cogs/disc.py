@@ -79,14 +79,14 @@ class User(commands.Cog):
 
         embed.set_footer(text='SaCuber Bot')
         embed.set_thumbnail(url=ctx.guild.icon_url)
-        embed.add_field(name=f':computer: **ID**', value=f'{ctx.guild.id}', inline=True)
-        embed.add_field(name=f':crown: **Owner**', value=f'`{str(ctx.guild.owner)}`\n({str(ctx.guild.owner_id)})',
+        embed.add_field(name=f'**ID**', value=f'{ctx.guild.id}', inline=True)
+        embed.add_field(name=f'**Owner**', value=f'`{str(ctx.guild.owner)}`\n({str(ctx.guild.owner_id)})',
                         inline=True)
-        embed.add_field(name=f':earth_africa: **Region**', value=ctx.guild.region, inline=True)
-        embed.add_field(name=f':speech_balloon: **Channels ({str(len(ctx.guild.channels))})**',
-                        value=f':pencil: **Text:** {str(len(ctx.guild.text_channels))}\n:speaking_head: **Voice:** {str(len(ctx.guild.voice_channels))}',
+        embed.add_field(name=f'**Region**', value=ctx.guild.region, inline=True)
+        embed.add_field(name=f'**Channels ({str(len(ctx.guild.channels))})**',
+                        value=f'**Text:** {str(len(ctx.guild.text_channels))}\n**Voice:** {str(len(ctx.guild.voice_channels))}',
                         inline=False)
-        embed.add_field(name=f':busts_in_silhouette: **Members**', value=f'**{str(len(ctx.guild.members))}**',
+        embed.add_field(name=f'**Members**', value=f'**{str(len(ctx.guild.members))}**',
                         inline=True)
 
         await ctx.send(embed=embed)

@@ -1,5 +1,9 @@
+import json
 import discord
 from discord.ext import commands
+
+with open('../data/config.json') as f:
+    sid = json.load(f)['sid']
 
 
 class Dev(commands.Cog):
@@ -9,7 +13,7 @@ class Dev(commands.Cog):
 
     @commands.command(name='status', hidden=True)
     async def status(self, ctx, setclear, stat_type='im', *, text='very cool'):
-        if ctx.author.id == (my_id):
+        if ctx.author.id == sid:
             if setclear.lower() == 'set':
                 if stat_type == "playing":
                     await self.client.change_presence(activity=discord.Game(name=text))
@@ -33,13 +37,13 @@ class Dev(commands.Cog):
 
     @commands.command(name='off', hidden=True)
     async def off(self, ctx):
-        if ctx.author.id == (my_id):
+        if ctx.author.id == sid:
             await ctx.send('Turning off...')
             exit()
 
     @commands.command(name='botserver')
     async def botserver(self, ctx, list_leave, index=None):
-        if ctx.author.id == (my_id):
+        if ctx.author.id == sid:
             guilds = []
             guildids = []
             for server in self.client.guilds:
@@ -61,7 +65,7 @@ class Dev(commands.Cog):
                     else:
                         try:
                             try:
-                                await toleave.channels[0].send('I\'m leaving this server! ByeBye idiots')
+                                await toleave.channels[0].send('I\'m leaving this server, so adios')
                             except Exception:
                                 return
                             await toleave.leave()

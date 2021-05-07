@@ -1,6 +1,10 @@
 import asyncio
+import json
 import discord
 from discord.ext import commands
+
+with open('../data/config.json') as f:
+    sid = json.load(f)['sid']
 
 
 class Mod(commands.Cog):
@@ -24,12 +28,12 @@ class Mod(commands.Cog):
 
     @commands.command(name='kick')
     async def kick(self, ctx, mention: discord.Member, *, reason='No reason provided.'):
-        if mention.id == (my_id):
+        if mention.id == sid:
             await ctx.send('no fok u he\'s cool')
         else:
             if (ctx.guild.me.top_role.position > mention.top_role.position
                     and not mention.guild_permissions.administrator and ctx.author.top_role.position > mention.top_role.position):
-                message = await ctx.send('Kick? React with "👍" to confirm, or ignore for 30 seconds to cancel.')
+                message = await ctx.reply('Kick? React with "👍" to confirm, or ignore for 30 seconds to cancel.')
                 await message.add_reaction('👍')
 
                 def check(reaction, user):
@@ -59,12 +63,12 @@ class Mod(commands.Cog):
 
     @commands.command(name='ban')
     async def ban(self, ctx, mention: discord.Member, *, reason='No reason provided.'):
-        if mention.id == (my_id):
+        if mention.id == sid:
             await ctx.send('no fok u he\'s cool')
         else:
             if (ctx.guild.me.top_role.position > mention.top_role.position
                     and not mention.guild_permissions.administrator and ctx.author.top_role.position > mention.top_role.position):
-                message = await ctx.send('Ban? React with "👍" to confirm, or ignore for 30 seconds to cancel.')
+                message = await ctx.reply('Ban? React with "👍" to confirm, or ignore for 30 seconds to cancel.')
                 await message.add_reaction('👍')
 
                 def check(reaction, user):

@@ -1,5 +1,6 @@
 import discord
 import os
+import json
 import requests
 import asyncio
 import moviepy.editor as mpe
@@ -7,6 +8,9 @@ from discord.ext import commands
 from pytube import YouTube, exceptions
 from PIL import Image, ImageEnhance
 from PIL.ImageFilter import EDGE_ENHANCE_MORE, DETAIL
+
+with open('../data/config.json') as f:
+    temp_path = json.load(f)['temp_path']
 
 
 class Media(commands.Cog):
@@ -59,13 +63,13 @@ class Media(commands.Cog):
                     await asyncio.sleep(0.1)
 
                     yt.streams.filter(res=resolution, only_video=True).first().download(
-                        '(path)', 'vid')
+                        temp_path, 'vid')
                     mp4tomp3(yt.streams.filter(only_audio=True).first().download(
-                        '(path)', 'aud'))
+                        f'{temp_path}\\', 'aud'))
 
-                    combine_audio(r'path\vid.mp4',
-                                  r'path\aud.mp3',
-                                  f'path{vid_title}.mp4', fps)
+                    combine_audio(f'{temp_path}\\vid.mp4',
+                                  f'{temp_path}\\aud.mp3',
+                                  f'{temp_path}\\{vid_title}.mp4', fps)
 
                 except exceptions.PytubeError or AttributeError:
 
@@ -74,16 +78,16 @@ class Media(commands.Cog):
                     await ctx.send('That video doesn\'t have that resolution!')
                 else:
                     if os.stat(
-                            f'path{vid_title}.mp4').st_size > 8000000:
+                            f'{temp_path}\\{vid_title}.mp4').st_size > 8000000:
                         print(os.stat(
-                            f'path\\{vid_title}.mp4').st_size)
+                            f'{temp_path}\\{vid_title}.mp4').st_size)
                         await ctx.send(
                             'Video file is too large (More than 8MB)! Please download at a lower resolution!')
 
                     else:
                         await ctx.send(f'{ctx.author.mention} Done!',
                                        file=discord.File(
-                                           f'filepath\\{vid_title}.mp4'))
+                                           f'{temp_path}\\{vid_title}.mp4'))
                     os.remove(f'./temp/{vid_title}.mp4')
                     os.remove(f'./temp/vid.mp4')
                     os.remove(f'./temp/aud.mp3')
@@ -116,31 +120,31 @@ class Media(commands.Cog):
                     if char in invalids:
                         vid_title = vid_title.replace(char, '')
                 out_file = yt.streams.filter(only_audio=True).first().download(
-                    r'C:\Users\santi\PycharmProjects\DiscordBot\temp', f'{vid_title}')
+                    temp_path, f'{vid_title}')
 
                 base, ext = os.path.splitext(out_file)
                 file_mp3 = base + '.mp3'
                 os.rename(out_file, file_mp3)
 
-                if os.stat(f'filepath\\{vid_title}.mp3').st_size > 8000000:
+                if os.stat(f'{temp_path}\\{vid_title}.mp3').st_size > 8000000:
                     await ctx.send('Video file is too large (More than 8MB)!')
                 else:
                     await ctx.send('Done!', file=discord.File(
-                        f'filepath\\{vid_title}.mp3'))
-                os.remove(f'filepath\\{vid_title}.mp3')
+                        f'{temp_path}\\{vid_title}.mp3'))
+                os.remove(f'{temp_path}\\{vid_title}.mp3')
 
     @commands.command(name='fry', aliases=['deepfry', 'imagefry', 'fryimage'])
     async def fry(self, ctx):
 
         def image_fry(link, filename, extension):
             r = requests.get(link)
-            with open(f'(FilePath)\\{filename}{extension}', 'wb') as outfile:
+            with open(f'{temp_path}\\{filename}{extension}', 'wb') as outfile:
                 outfile.write(r.content)
-            im = Image.open(f'(FilePath)\\{filename}{extension}')
+            im = Image.open(f'{temp_path}\\{filename}{extension}')
             ehm = im.filter(EDGE_ENHANCE_MORE)
             ed = ehm.filter(DETAIL)
             ihc = ImageEnhance.Contrast(ed)
-            ihc.enhance(4).save(f'(FilePath)\\{filename}{extension}')
+            ihc.enhance(4).save(f'{temp_path}\\{filename}{extension}')
 
         try:
             attachment = ctx.message.attachments[0]
@@ -151,35 +155,35 @@ class Media(commands.Cog):
                 try:
                     image_fry(attachment.url, name, ext)
                     await ctx.send(file=discord.File(
-                        f'(FilePath)\\{str(attachment.filename)}'))
+                        f'{temp_path}\\{str(attachment.filename)}'))
                 except ValueError:
                     await ctx.send('Something went wrong! Make sure your image isn\'t transparent!')
-                os.remove(f'(FilePath)\\{str(attachment.filename)}')
+                os.remove(f'{temp_path}\\{str(attachment.filename)}')
         except IndexError:
             attachment = str(ctx.message.author.avatar_url).replace('webp', 'png')[:-10]
             name = str(ctx.message.author.display_name)
             ext = '.png'
             try:
                 image_fry(attachment, name, ext)
-                await ctx.send(file=discord.File(f'(FilePath)\\{name + ext}'))
+                await ctx.send(file=discord.File(f'{temp_path}\\{name + ext}'))
             except ValueError:
                 await ctx.send('Something went wrong! Make sure your image isn\'t transparent!')
-            os.remove(f'(FilePath)\\{name + ext}')
+            os.remove(f'{temp_path}\\{name + ext}')
 
     @commands.command(name='pixelate', aliases=['pixel', 'downscale', 'pixelize'])
     async def pixelate(self, ctx, scale=None):
 
         def pixelate_image(link, filename, extension, img_scale: int):
             r = requests.get(link)
-            with open(f'(FilePath)\\{filename}{extension}', 'wb') as outfile:
+            with open(f'{temp_path}\\{filename}{extension}', 'wb') as outfile:
                 outfile.write(r.content)
-            im = Image.open(f'(FilePath)\\{filename}{extension}')
+            im = Image.open(f'{temp_path}\\{filename}{extension}')
             width, height = im.size
             width = round(width / img_scale)
             height = round(height / img_scale)
             resized = im.resize((width, height))
             result = resized.resize(im.size, Image.NEAREST)
-            result.save(f'(FilePath)\\{filename}{extension}')
+            result.save(f'{temp_path}\\{filename}{extension}')
 
         if scale is None:
             await ctx.send('You must include a scale (Number that resolution will be divided by)')
@@ -198,11 +202,11 @@ class Media(commands.Cog):
                             try:
                                 pixelate_image(attachment.url, name, ext, scale)
                                 await ctx.send(file=discord.File(
-                                    f'(FilePath)\\{str(attachment.filename)}'))
+                                    f'{temp_path}\\{str(attachment.filename)}'))
                             except ValueError:
                                 await ctx.send('Something went wrong! Make sure your image isn\'t transparent!')
                             os.remove(
-                                f'(FilePath)\\{str(attachment.filename)}')
+                                f'{temp_path}\\{str(attachment.filename)}')
                     except IndexError:
                         attachment = str(ctx.message.author.avatar_url).replace('webp', 'png')[:-10]
                         name = str(ctx.message.author.display_name)
@@ -210,10 +214,10 @@ class Media(commands.Cog):
                         try:
                             pixelate_image(attachment, name, ext, scale)
                             await ctx.send(
-                                file=discord.File(f'(FilePath)\\{name + ext}'))
+                                file=discord.File(f'{temp_path}\\{name + ext}'))
                         except ValueError:
                             await ctx.send('Something went wrong! Make sure your image isn\'t transparent!')
-                        os.remove(f'(FilePath)\\{name + ext}')
+                        os.remove(f'{temp_path}\\{name + ext}')
             except ValueError:
                 await ctx.send('Invalid scale character!')
 

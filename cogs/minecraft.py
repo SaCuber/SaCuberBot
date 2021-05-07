@@ -1,8 +1,12 @@
 import os
+import json
 import mcuuid
 import discord
 import requests
 from discord.ext import commands
+
+with open('../data/config.json') as f:
+    temp_path = json.load(f)['temp_path']
 
 
 class Minecraft(commands.Cog):
@@ -18,10 +22,10 @@ class Minecraft(commands.Cog):
             await ctx.send('Ayo there\'s no one with that name what do you mean')
         else:
             r = requests.get(f'https://crafatar.com/avatars/{str(uuid)}?overlay')
-            with open(f'(FilePath)\\{str(uuid)}_avatar.png', 'wb') as outfile:
+            with open(f'{temp_path}\\{str(uuid)}_avatar.png', 'wb') as outfile:
                 outfile.write(r.content)
-            await ctx.send(file=discord.File(f'(FilePath)\\{str(uuid)}_avatar.png'))
-            os.remove(f'(FilePath)\\{str(uuid)}_avatar.png')
+            await ctx.send(file=discord.File(f'{temp_path}\\{str(uuid)}_avatar.png'))
+            os.remove(f'{temp_path}\\{str(uuid)}_avatar.png')
 
     @commands.command(name='mchead', aliases=['mch', 'mc_head', 'minecrafthead', 'minecraft_head'])
     async def mchead(self, ctx, person):
@@ -31,10 +35,10 @@ class Minecraft(commands.Cog):
             await ctx.send('Ayo there\'s no one with that name what do you mean')
         else:
             r = requests.get(f'https://crafatar.com/renders/head/{str(uuid)}?overlay')
-            with open(f'(FilePath)\\{str(uuid)}_head.png', 'wb') as outfile:
+            with open(f'{temp_path}\\{str(uuid)}_head.png', 'wb') as outfile:
                 outfile.write(r.content)
-            await ctx.send(file=discord.File(f'(FilePath)\\{str(uuid)}_head.png'))
-            os.remove(f'(FilePath)\\{str(uuid)}_head.png')
+            await ctx.send(file=discord.File(f'{temp_path}\\{str(uuid)}_head.png'))
+            os.remove(f'{temp_path}\\{str(uuid)}_head.png')
 
     @commands.command(name='mcbody', aliases=['mcb', 'mc_body', 'minecraftbody', 'minecraft_body'])
     async def mcbody(self, ctx, person):
@@ -44,10 +48,10 @@ class Minecraft(commands.Cog):
             await ctx.send('Ayo there\'s no one with that name what do you mean')
         else:
             r = requests.get(f'https://crafatar.com/renders/body/{str(uuid)}?overlay')
-            with open(f'(FilePath)\\{str(uuid)}_body.png', 'wb') as outfile:
+            with open(f'{temp_path}\\{str(uuid)}_body.png', 'wb') as outfile:
                 outfile.write(r.content)
-            await ctx.send(file=discord.File(f'(FilePath)\\{str(uuid)}_body.png'))
-            os.remove(f'(FilePath)\\{str(uuid)}_body.png')
+            await ctx.send(file=discord.File(f'{temp_path}\\{str(uuid)}_body.png'))
+            os.remove(f'{temp_path}\\{str(uuid)}_body.png')
 
     @commands.command(name='mcskin', aliases=['mcs', 'mc_skin', 'minecraftskin', 'minecraft_skin'])
     async def mcskin(self, ctx, person):
@@ -57,10 +61,10 @@ class Minecraft(commands.Cog):
             await ctx.send('Ayo there\'s no one with that name what do you mean')
         else:
             r = requests.get(f'https://crafatar.com/skins/{str(uuid)}')
-            with open(f'(FilePath)\\{str(uuid)}_skin.png', 'wb') as outfile:
+            with open(f'{temp_path}\\{str(uuid)}_skin.png', 'wb') as outfile:
                 outfile.write(r.content)
-            await ctx.send(file=discord.File(f'(FilePath)\\{str(uuid)}_skin.png'))
-            os.remove(f'(FilePath)\\{str(uuid)}_skin.png')
+            await ctx.send(file=discord.File(f'{temp_path}\\{str(uuid)}_skin.png'))
+            os.remove(f'{temp_path}\\{str(uuid)}_skin.png')
 
     @commands.command(name='mcuuid', aliases=['mcu', 'mc_uuid', 'minecraftuuid', 'minecraft_uuid'])
     async def mcuuid(self, ctx, person):

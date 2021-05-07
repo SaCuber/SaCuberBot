@@ -1,5 +1,6 @@
 import os
 import random
+import json
 import pytesseract
 from pyowm.owm import OWM
 from currency_converter import CurrencyConverter
@@ -132,6 +133,11 @@ langs = ['af', 'sq', 'am', 'ar', 'hy', 'az', 'eu', 'be', 'bn', 'bs', 'bg', 'ca',
          'st', 'sn', 'sd', 'si', 'sk', 'sl', 'so', 'es', 'su', 'sw', 'sv',
          'tg', 'ta', 'te', 'th', 'tr', 'uk', 'ur', 'ug', 'uz', 'vi', 'cy', 'xh', 'yi', 'yo', 'zu']
 
+with open('../data/config.json') as f:
+    temp_path = json.load(f)['temp_path']
+    tesseract_path = json.load(f)['tesseract_path']
+    wapi_key = json.load(f)['wapi_key']
+
 
 class Utils(commands.Cog):
 
@@ -163,7 +169,7 @@ class Utils(commands.Cog):
             await ctx.send(
                 'u gotta put the language as 2 letters (example: "en" for english) (iso 639-1 language codes)')
 
-    @commands.command(name='language',aliases=['l', 'lang', 'detect_language', 'detect_lang', 'detectlang', 'detectlanguage'])
+    @commands.command(name='language', aliases=['l', 'lang', 'detect_language', 'detect_lang', 'detectlang', 'detectlanguage'])
     async def language(self, ctx, *, message):
         translator = Translator()
         detected_lang = translator.detect(message)
@@ -179,17 +185,17 @@ class Utils(commands.Cog):
                 await ctx.send('Please input a valid image file!')
             else:
                 r = requests.get(attachment.url)
-                with open(f'(filepath)\\code_image.png',
+                with open(f'{temp_path}\\code_image.png',
                           'wb') as outfile:
                     outfile.write(r.content)
 
-                data = decode(Image.open("(filepath)\\code_image.png"))
+                data = decode(Image.open(f"{temp_path}\\code_image.png"))
                 try:
                     content = data[0][0].decode('utf-8')
                     await ctx.send(content)
                 except IndexError:
                     await ctx.send('That doesnt have a code what do you mean')
-                os.remove(f'(filepath)\\code_image.png')
+                os.remove(f'{temp_path}\\code_image.png')
         except IndexError:
             await ctx.send('You gotta attach an image you dumbass')
 
@@ -204,7 +210,7 @@ class Utils(commands.Cog):
 
     @commands.command(name='read')
     async def read(self, ctx):
-        pytesseract.pytesseract.tesseract_cmd = r'C:\Users\santi\AppData\Local\Programs\Tesseract-OCR\tesseract'
+        pytesseract.pytesseract.tesseract_cmd = tesseract_path
         try:
             attachment = ctx.message.attachments[0]
             r = requests.get(attachment.url)
@@ -212,12 +218,12 @@ class Utils(commands.Cog):
             if not str(attachment.url).endswith(('png', 'jpg', 'jpeg', 'webp')):
                 await ctx.send('Please input a valid image file!')
             else:
-                with open(f'(filepath)\\{str(ctx.author.id)}',
+                with open(f'{temp_path}\\{str(ctx.author.id)}',
                           'wb') as outfile:
                     outfile.write(r.content)
                 try:
                     await ctx.send(pytesseract.image_to_string(
-                        f'(filepath)\\{str(ctx.author.id)}'))
+                        f'{temp_path}\\{str(ctx.author.id)}'))
                 except discord.HTTPException:
                     await ctx.send('Couldn\'t identify any letters')
         except IndexError:
@@ -266,7 +272,7 @@ class Utils(commands.Cog):
     @commands.command(name='weather', aliases=['wt', 'w'])
     async def weather(self, ctx, *, location):
         location = location.capitalize()
-        apikey = myapikey
+        apikey = wapi_key
         owm = OWM(apikey)
         mgr = owm.weather_manager()
         observation = mgr.weather_at_place(location)

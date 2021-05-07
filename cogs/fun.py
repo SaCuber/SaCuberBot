@@ -13,6 +13,12 @@ from pokedex import pokedex
 from prawcore import NotFound
 from discord.ext import commands
 
+with open('../data/config.json') as f:
+    reddit_client = json.load(f)['reddit_client']
+    reddit_secret = json.load(f)['reddit_secret']
+    reddit_ua = json.load(f)['reddit_ua']
+    data_path = json.load(f)['data_path']
+
 pokedex = pokedex.Pokedex()
 
 player1 = ""
@@ -50,9 +56,9 @@ class Fun(commands.Cog):
     async def reddit(self, ctx, *, subreddit='homepage'):
 
         global submission
-        reddit = praw.Reddit(client_id=MyRedditIDWHYAREYOULOOKING',
-                             client_secret=dontEvenTry,
-                             user_agent=Poger,
+        reddit = praw.Reddit(client_id=reddit_client,
+                             client_secret=reddit_secret,
+                             user_agent=reddit_ua,
                              check_for_async=False)
 
         def sub_exists(sub):
@@ -222,14 +228,14 @@ class Fun(commands.Cog):
 
     @commands.command(name='howcool', aliases=['cool', 'hc'])
     async def cool(self, ctx, mention: discord.Member = 'self'):
-        with open(FilePath, "r") as file:
+        with open(f'{data_path}\\cool.json', "r") as file:
             content = json.load(file)
         if mention == 'self':
             if str(ctx.author.id) in content:
                 await ctx.send(f'You\'re {content[str(ctx.author.id)]}% cool')
             else:
                 content[str(ctx.author.id)] = random.randint(0, 100)
-                with open('(FilePath)cool.json', "w") as file:
+                with open(f'{data_path}\\cool.json', "w") as file:
                     json.dump(content, file, indent=4)
                 await ctx.send(f'You\'re {content[str(ctx.author.id)]}% cool')
         else:
@@ -237,17 +243,17 @@ class Fun(commands.Cog):
                 await ctx.send(f'{mention.mention} is {content[str(mention.id)]}% cool')
             else:
                 content[str(mention.id)] = random.randint(0, 100)
-                with open('(FilePath)cool.json', "w") as file:
+                with open(f'{data_path}\\cool.json', "w") as file:
                     json.dump(content, file, indent=4)
                 await ctx.send(f'{mention.mention} is {content[str(mention.id)]}% cool')
 
     @commands.command(name='forcecool', hidden=True)
     async def forcecool(self, ctx, mention: discord.Member, *, thing):
-        if ctx.author.id == (my_id):
-            with open('(FilePath)cool.json', "r") as file:
+        if ctx.author.id == 559805065486008331:
+            with open(f'{data_path}\\cool.json', "r") as file:
                 content = json.load(file)
             content[str(mention.id)] = thing
-            with open('(FilePath)cool.json', "w") as file:
+            with open(f'{data_path}\\cool.json', "w") as file:
                 json.dump(content, file, indent=4)
             await ctx.send('alr')
         else:
@@ -255,19 +261,19 @@ class Fun(commands.Cog):
 
     @commands.command(name='ship', aliases=['sp', 's'])
     async def ship(self, ctx, p1, p2):
-        with open('(FilePath)ship.json', 'r') as file:
+        with open(f'{data_path}\\ship.json', 'r') as file:
             content = json.load(file)
         p1 = p1.replace("!", "")
         p2 = p2.replace("!", "")
         joined = f'{p1.lower()} {p2.lower()}'
         joined_r = f'{p2.lower()} {p1.lower()}'
-        if joined in content or joined_r in content:
+        if joined in content:
             await ctx.send(f'{p1} ------ {str(content[joined])}% ------ {p2}')
         elif joined_r in content:
             await ctx.send(f'{p1} ------ {str(content[joined_r])}% ------ {p2}')
         else:
             content[joined] = random.randint(0, 100)
-            with open('(FilePath)ship.json', 'w') as file:
+            with open(f'{data_path}\\ship.json', 'w') as file:
                 json.dump(content, file, indent=4)
             await ctx.send(f'{p1} ------ {str(content[joined])}% ------ {p2}')
 
@@ -327,13 +333,13 @@ class Fun(commands.Cog):
     @commands.command(name='emojify')
     async def emojify(self, ctx, *, message):
         end_message = []
-        with open(r'(filepath)\emojicharacters.json', "r") as file:
+        with open(f'{data_path}\\emojicharacters.json', "r") as file:
             emoji_characters = json.load(file)
         for character in message:
             if character.lower() in emoji_characters:
                 end_message.append(f'{emoji_characters[character.lower()]} ')
             else:
-                await ctx.send(f'Unsuported character: {character}')
+                return
         await ctx.send(''.join(end_message))
 
     @commands.command(name='hack')
@@ -474,6 +480,32 @@ class Fun(commands.Cog):
     async def advice(self, ctx):
         await ctx.send(requests.get('https://api.adviceslip.com/advice').json()['slip']['advice'])
 
+    @commands.command(name='dog')
+    async def dog(self, ctx, *, breed = 'random'):
+        if breed == 'random':
+            r = requests.get(f'https://dog.ceo/api/breeds/image/random').json()
+        else:
+            breed_split = breed.split(' ')
+            if len(breed_split) == 1:
+                r = requests.get(f'https://dog.ceo/api/breed/{breed.lower()}/images/random').json()
+            else:
+                r = requests.get(f'https://dog.ceo/api/breed/{breed_split[1].lower()}/{breed_split[0].lower()}/images/random').json()
+        if r['status'] != 'success':
+            if r['message'] == 'Breed not found (master breed does not exist)':
+                await ctx.send('That\'s not a breed what do you mean do you have stupid')
+            else:
+                await ctx.send(f'Ayo something went wrong and I don\'t know why.\nError: {r["message"]}')
+        else:
+            embed = discord.Embed(
+                title='Here ya go :)',
+                description='\u200b',
+                colour=discord.Colour.random()
+            )
+            embed.set_footer(text='SaCuber Bot')
+            embed.set_image(url=r['message'])
+            await ctx.send(embed=embed)
+
+
     @trump.error
     async def trump_error(self, ctx, error):
         await ctx.send(f'Something\'s gone wrong and I don\'t know why.\nError: {error}')
@@ -527,9 +559,9 @@ class Fun(commands.Cog):
     @tictactoe.error
     async def tictactoe_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send("How sad are you that you want to play alone?")
+            await ctx.send("Please mention 2 players for this command.")
         elif isinstance(error, commands.BadArgument):
-            await ctx.send("Dude PIng a player")
+            await ctx.send("Please make sure to mention/ping players (ie. <@688534433879556134>).")
 
     @place.error
     async def place_error(self, ctx, error):
