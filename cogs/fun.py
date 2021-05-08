@@ -505,7 +505,11 @@ class Fun(commands.Cog):
             embed.set_image(url=r['message'])
             await ctx.send(embed=embed)
 
-
+    @commands.command(name='dadjoke', aliases=['dad_joke', 'dad'])
+    async def dadjoke(self, ctx):
+        headers = {'Accept': 'text/plain'}
+        await ctx.send(requests.get('https://icanhazdadjoke.com/', headers = headers).text)
+                               
     @trump.error
     async def trump_error(self, ctx, error):
         await ctx.send(f'Something\'s gone wrong and I don\'t know why.\nError: {error}')
